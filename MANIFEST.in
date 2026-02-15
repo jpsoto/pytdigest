@@ -1,0 +1,13 @@
+# MANIFEST.in
+include README.rst
+include LICENSE
+include pytdigest/*.c
+include pytdigest/*.h
+recursive-include tests *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.pyc
+recursive-exclude * *.pyo
+recursive-exclude * *.so
+recursive-exclude * *.dll
+recursive-exclude * *.dylib
+
