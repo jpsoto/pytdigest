@@ -136,3 +136,25 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Vim Swap files
+*.swp
+*.swo
+*.swn
+
+# Vim Backup files
+*~
+*.bak
+*.orig
+
+# Vim session files
+Session.vim
+*.vim.session
+
+# Vim Temporary files
+*.tmp
+*.temp
+
+# Vim Undo files (si usas undo persistente)
+*.un~
+

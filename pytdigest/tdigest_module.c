@@ -118,6 +118,34 @@ static PyObject* py_add_batch(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
+#include <numpy/arrayobject.h>
+static PyObject* py_add_batch_TBC(PyObject *self, PyObject *args) {
+    PyObject *cap, *x_obj, *w_obj;
+    if (!PyArg_ParseTuple(args,"OOO",&cap,&x_obj,&w_obj)) return NULL;
+
+    PyArrayObject *x_array = (PyArrayObject*)PyArray_FROM_OTF(x_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+    PyArrayObject *w_array = (PyArrayObject*)PyArray_FROM_OTF(w_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+
+    if (x_array == NULL || w_array == NULL) return NULL;
+
+    npy_intp n = PyArray_SIZE(x_array);
+    if (PyArray_SIZE(w_array) != n) {
+        Py_XDECREF(x_array);
+        Py_XDECREF(w_array);
+        return PyErr_Format(PyExc_ValueError,"size mismatch");
+    }
+
+    double *means = (double*)PyArray_DATA(x_array);
+    double *weights = (double*)PyArray_DATA(w_array);
+
+    td_add_batch(get_td(cap), (int)n, means, weights);
+
+    Py_XDECREF(x_array);
+    Py_XDECREF(w_array);
+    Py_RETURN_NONE;
+}
+
+
 /* batch CDF */
 static PyObject* py_cdf_batch(PyObject *self, PyObject *args) {
     PyObject *cap,*vals;

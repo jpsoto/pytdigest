@@ -43,8 +43,10 @@ class TDigest:
             w: pesos opcionales
             handling_invalid: cómo tratar valores inválidos ['drop', 'raise']
         """
-        x = self._unwrap_if_possible(x)
-        w = self._unwrap_if_possible(w)
+
+        """Convierte np.array de tamaño 1 a float."""
+        if isinstance(x, np.ndarray) and x.size == 1: x = float(x)
+        if isinstance(w, np.ndarray) and w.size == 1: w = float(w)
 
         if isinstance(x, Number):
             if np.isfinite(x):
@@ -76,10 +78,11 @@ class TDigest:
                 raise ValueError("x o w contienen valores inválidos.")
             x = x[~invalid]
             w = w[~invalid]
-            if not x.flags.c_contiguous:
-                x = x.copy()
-            if not w.flags.c_contiguous:
-                w = w.copy()
+
+            # TBC. Not needed if using add_batch_TBC
+            if not x.flags.c_contiguous: x = x.copy()
+            if not w.flags.c_contiguous: w = w.copy()
+
             _tdigest.add_batch(self._tdigest, x, w)
         else:
             raise TypeError("x debe ser número o ndarray.")
@@ -165,10 +168,4 @@ class TDigest:
             return np.nan
         return _tdigest.total_sum(self._tdigest) / w
 
-    @staticmethod
-    def _unwrap_if_possible(x):
-        """Convierte np.array de tamaño 1 a float."""
-        if isinstance(x, np.ndarray) and x.size == 1:
-            x = float(x)
-        return x
 
