@@ -2,6 +2,19 @@
 #include <Python.h>
 #include "tdigest.c"
 
+/*
+https://docs.python.org/3/c-api/
+PyModuleDef,      PEP 3121
+PyCapsule,        PEP 3118/3121
+PY_SSIZE_T_CLEAN, PEP 353
+Py_ssize_t,       PEP 353
+
+https://numpy.org/doc/1.25/reference/c-api/index.html
+PyArrayObject,    C-API NumPy
+PyArray_FROM_OTF, C-API NumPy
+*/
+
+
 #define CAPSULE_NAME "pytdigest.tdigest"
 
 static void capsule_destructor(PyObject *capsule) {
