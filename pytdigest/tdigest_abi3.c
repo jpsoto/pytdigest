@@ -1,6 +1,6 @@
 //#define Py_LIMITED_API 3 // ABI3 conformant. Keep in mind C-API NumPy is no ABI3
-#define PY_SSIZE_T_CLEAN // https://docs.python.org/3/c-api/arg.html#strings-and-buffers
-#include <Python.h>
+//#define PY_SSIZE_T_CLEAN // https://docs.python.org/3/c-api/arg.html#strings-and-buffers
+//#include <Python.h>
 #include "tdigest.h"
 
 /*
@@ -17,17 +17,14 @@ PyArrayObject,    C-API NumPy
 PyArray_FROM_OTF, C-API NumPy
 */
 
-
-#define CAPSULE_NAME "pytdigest.tdigest"
-
-static void capsule_destructor(PyObject *capsule) {
-    tdigest_t *td = PyCapsule_GetPointer(capsule, CAPSULE_NAME);
-    if (td) td_free(td);
-}
-
-static tdigest_t* get_td(PyObject *capsule) {
-    return (tdigest_t*)PyCapsule_GetPointer(capsule, CAPSULE_NAME);
-}
+//#define PY_CAPSULE_NAME "pytdigest.tdigest"
+//static void capsule_destructor(PyObject *capsule) {
+ //   tdigest_t *td = PyCapsule_GetPointer(capsule, PY_CAPSULE_NAME);
+//    if (td) td_free(td);
+//}
+//static tdigest_t* get_td(PyObject *capsule) {
+//    return (tdigest_t*)PyCapsule_GetPointer(capsule, PY_CAPSULE_NAME);
+//}
 
 /* create(delta) */
 static PyObject* py_create(PyObject *self, PyObject *args) {
@@ -35,7 +32,7 @@ static PyObject* py_create(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "d", &delta)) return NULL;
     tdigest_t *td = td_new(delta);
     if (!td) return PyErr_NoMemory();
-    return PyCapsule_New(td, CAPSULE_NAME, capsule_destructor);
+    return PyCapsule_New(td, PY_CAPSULE_NAME, capsule_destructor);
 }
 
 /* reset(td) */
@@ -255,27 +252,30 @@ static PyObject* py_of_centroids(PyObject *self, PyObject *args) {
     tdigest_t *td = td_of_centroids(delta,(int)n,buf);
     free(buf);
 
-    return PyCapsule_New(td,CAPSULE_NAME,capsule_destructor);
+    return PyCapsule_New(td,PY_CAPSULE_NAME,capsule_destructor);
 }
 
 static PyMethodDef Methods[] = {
-    {"create",py_create,METH_VARARGS,""},
-    {"reset",py_reset,METH_VARARGS,""},
-    {"add",py_add,METH_VARARGS,""},
-    {"merge",py_merge,METH_VARARGS,""},
-    {"value_at",py_value_at,METH_VARARGS,""},
-    {"quantile_of",py_quantile_of,METH_VARARGS,""},
-    {"trimmed_mean",py_trimmed_mean,METH_VARARGS,""},
-    {"total_weight",py_total_weight,METH_VARARGS,""},
-    {"total_sum",py_total_sum,METH_VARARGS,""},
-    {"scale_weight",py_scale_weight,METH_VARARGS,""},
-    {"shift",py_shift,METH_VARARGS,""},
-    {"add_batch",py_add_batch,METH_VARARGS,""},
-    {"cdf_batch",py_cdf_batch,METH_VARARGS,""},
-    {"inverse_cdf_batch",py_inverse_cdf_batch,METH_VARARGS,""},
-    {"num_centroids",py_num_centroids,METH_VARARGS,""},
-    {"get_centroids",py_get_centroids,METH_VARARGS,""},
-    {"of_centroids",py_of_centroids,METH_VARARGS,""},
+    // ABI3 conformant functions
+    {"create",             py_create,             METH_VARARGS,""},
+    {"reset",              py_reset,              METH_VARARGS,""},
+    {"add",                py_add,                METH_VARARGS,""},
+    {"merge",              py_merge,              METH_VARARGS,""},
+    {"value_at",           py_value_at,           METH_VARARGS,""},
+    {"quantile_of",        py_quantile_of,        METH_VARARGS,""},
+    {"trimmed_mean",       py_trimmed_mean,       METH_VARARGS,""},
+    {"total_weight",       py_total_weight,       METH_VARARGS,""},
+    {"total_sum",          py_total_sum,          METH_VARARGS,""},
+    {"scale_weight",       py_scale_weight,       METH_VARARGS,""},
+    {"shift",              py_shift,              METH_VARARGS,""},
+    {"add_batch",          py_add_batch,          METH_VARARGS,""},
+    {"cdf_batch",          py_cdf_batch,          METH_VARARGS,""},
+    {"inverse_cdf_batch",  py_inverse_cdf_batch,  METH_VARARGS,""},
+    {"num_centroids",      py_num_centroids,      METH_VARARGS,""},
+    {"get_centroids",      py_get_centroids,      METH_VARARGS,""},
+    {"of_centroids",       py_of_centroids,       METH_VARARGS,""},
+    // ABI3 non-conformant functions, see tdigest_noabi.c
+    {"add_batch_zerocopy", py_add_batch_zerocopy, METH_VARARGS,""},
     {NULL,NULL,0,NULL}
 };
 

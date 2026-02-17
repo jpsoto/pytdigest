@@ -3,15 +3,18 @@ import numpy as np
 
 
 # Definición de la extensión C
+# https://setuptools.pypa.io/en/latest/userguide/ext_modules.html
 tdigest_extension = Extension(
     "pytdigest._tdigest",
-    sources=["pytdigest/tdigest_module.c",
+    sources=["pytdigest/tdigest_abi3.c",
+             "pytdigest/tdigest_noabi.c",
              "pytdigest/tdigest.c"],
     include_dirs=[np.get_include(),  # numpy/arrayobject.h
                   "pytdigest"]       # tdigest.h
 )
 
 # Configuración del paquete
+# https://setuptools.pypa.io/en/latest/references/keywords.html
 setup(
     name="pytdigest",
     version="0.1.4rc1",
