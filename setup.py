@@ -5,8 +5,10 @@ import numpy as np
 # Definición de la extensión C
 tdigest_extension = Extension(
     "pytdigest._tdigest",
-    sources=["pytdigest/tdigest_module.c"],
-    include_dirs=[np.get_include()],  # <-- Para incluir numpy/arrayobject.h
+    sources=["pytdigest/tdigest_module.c",
+             "pytdigest/tdigest.c"],
+    include_dirs=[np.get_include(),  # numpy/arrayobject.h
+                  "pytdigest"]       # tdigest.h
 )
 
 # Configuración del paquete

@@ -8,19 +8,13 @@
 // Copyright (c) 2022 Tomas Protivinsky, All rights reserved.
 //      https://github.com/protivinsky/pytdigest
 
-#ifdef _MSC_VER
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include "tdigest.h"
 
-typedef struct tdigest tdigest_t;
 
 // td_new allocates a new histogram.
 // It is similar to init but assumes that it can use malloc.
@@ -75,12 +69,6 @@ void td_shift(tdigest_t *h, double shift);
  * - add scaling of volatility?
  * - some testing and benchmarking, so I can see impact of changes
  */
-
-
-typedef struct centroid {
-    double mean;
-    double weight;
-} centroid_t;
 
 static int centroid_compare(const void *v1, const void *v2) {
     centroid_t *c1 = (centroid_t *)(v1);

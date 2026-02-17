@@ -1,7 +1,7 @@
 //#define Py_LIMITED_API 3 // ABI3 conformant. Keep in mind C-API NumPy is no ABI3
 #define PY_SSIZE_T_CLEAN // https://docs.python.org/3/c-api/arg.html#strings-and-buffers
 #include <Python.h>
-#include "tdigest.c"
+#include "tdigest.h"
 
 /*
 https://docs.python.org/3/c-api/
