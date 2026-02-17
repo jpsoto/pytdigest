@@ -12,7 +12,7 @@ tdigest_extension = Extension(
 # Configuración del paquete
 setup(
     name="pytdigest",
-    version="0.1.4",
+    version="0.1.4rc1",
     description="Python package for *fast* T-Digest calculation.",
     packages=["pytdigest"],
     install_requires=[

@@ -139,8 +139,16 @@ class TDigest:
         new += self
         return new
 
+    def num_centroids(self):
+        return _tdigest.num_centroids(self._tdigest)
+
     def get_centroids(self):
-        """Devuelve los centroides como un array 2D (mean, weight)."""
+        """
+        Devuelve los centroides como un array NumPy 2D (mean, weight).
+        Es utilizable desde NumPy, y tambien desde Python puro si
+        solo se va a iterar, en otros casos hacer copia con
+        list() o .tolist()
+        """
         centroids_list = _tdigest.get_centroids(self._tdigest)
         return np.array(centroids_list)
 

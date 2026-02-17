@@ -1,9 +1,12 @@
-#define PY_SSIZE_T_CLEAN
+//#define Py_LIMITED_API 3 // ABI3 conformant. Keep in mind C-API NumPy is no ABI3
+#define PY_SSIZE_T_CLEAN // https://docs.python.org/3/c-api/arg.html#strings-and-buffers
 #include <Python.h>
 #include "tdigest.c"
 
 /*
 https://docs.python.org/3/c-api/
+https://docs.python.org/3/c-api/stable.html
+ABI3              PEP 384
 PyModuleDef,      PEP 3121
 PyCapsule,        PEP 3118/3121
 PY_SSIZE_T_CLEAN, PEP 353
@@ -175,7 +178,7 @@ static PyObject* py_cdf_batch(PyObject *self, PyObject *args) {
 
     PyObject *list=PyList_New(n);
     for (Py_ssize_t i=0;i<n;i++)
-        PyList_SET_ITEM(list,i,PyFloat_FromDouble(out[i]));
+        PyList_SetItem(list,i,PyFloat_FromDouble(out[i]));
 
     free(in); free(out);
     return list;
@@ -197,10 +200,17 @@ static PyObject* py_inverse_cdf_batch(PyObject *self, PyObject *args) {
 
     PyObject *list=PyList_New(n);
     for (Py_ssize_t i=0;i<n;i++)
-        PyList_SET_ITEM(list,i,PyFloat_FromDouble(out[i]));
+        PyList_SetItem(list,i,PyFloat_FromDouble(out[i]));
 
     free(in); free(out);
     return list;
+}
+
+/* num_centroids(td) */
+static PyObject* py_num_centroids(PyObject *self, PyObject *args) {
+    PyObject *cap;
+    if (!PyArg_ParseTuple(args, "O", &cap)) return NULL;
+    return PyLong_FromLong(td_num_centroids(get_td(cap)));
 }
 
 /* get_centroids */
@@ -209,7 +219,8 @@ static PyObject* py_get_centroids(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args,"O",&cap)) return NULL;
 
     tdigest_t *td = get_td(cap);
-    int n = td->num_merged + td->num_unmerged;
+    //int n = td->num_merged + td->num_unmerged;
+    int n = td_num_centroids(td);
 
     double *buf = malloc(sizeof(double)*2*n);
     td_get_centroids(td,buf);
@@ -221,7 +232,7 @@ static PyObject* py_get_centroids(PyObject *self, PyObject *args) {
             PyFloat_FromDouble(buf[2*i]),
             PyFloat_FromDouble(buf[2*i+1])
         );
-        PyList_SET_ITEM(list,i,pair);
+        PyList_SetItem(list,i,pair);
     }
     free(buf);
     return list;
@@ -262,6 +273,7 @@ static PyMethodDef Methods[] = {
     {"add_batch",py_add_batch,METH_VARARGS,""},
     {"cdf_batch",py_cdf_batch,METH_VARARGS,""},
     {"inverse_cdf_batch",py_inverse_cdf_batch,METH_VARARGS,""},
+    {"num_centroids",py_num_centroids,METH_VARARGS,""},
     {"get_centroids",py_get_centroids,METH_VARARGS,""},
     {"of_centroids",py_of_centroids,METH_VARARGS,""},
     {NULL,NULL,0,NULL}

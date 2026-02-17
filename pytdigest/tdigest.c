@@ -272,7 +272,7 @@ DLL_EXPORT void merge(tdigest_t *td) {
         double q2 = (weight_so_far + proposed_weight) / total_weight;
         // bool should_add = (z <= (q0 * (1 - q0))) && (z <= (q2 * (1 - q2)));
         // hack to avoid underflow when scaling weights (exp decay)
-        bool should_add = (z <= (q0 * (1 - q0))) && (z <= (q2 * (1 - q2))) || weight_too_small || equal_means;
+        bool should_add = ((z <= q0*(1 - q0)) && (z <= q2*(1 - q2))) || weight_too_small || equal_means;
         if (should_add) {
             td->centroids[cur].weight += td->centroids[i].weight;
             double diff = td->centroids[i].mean - td->centroids[cur].mean;
@@ -474,6 +474,9 @@ DLL_EXPORT centroid_t *td_get_centroid(tdigest_t *td, int i) {
     return &td->centroids[i];
 }
 
+DLL_EXPORT int td_num_centroids(tdigest_t *td) {
+    return td->num_merged + td->num_unmerged;
+}
 DLL_EXPORT void td_get_centroids(tdigest_t *td, double *centroids) {
     for (int i = 0; i < td->num_merged + td->num_unmerged; i++) {
         centroids[2 * i] = td->centroids[i].mean;
